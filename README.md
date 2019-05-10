@@ -4,18 +4,22 @@ Before going off to add the rules, it will print out to console a summary of the
 It will then ask for confirmation from the operator of the script.
 
 
-#Dependencies and initial setup:
+## Dependencies and initial setup:
 
 Python 3.6 with the following modules installed: 
-requests
-meraki
+
+1. requests
+2. meraki
+
 
 More details on the meraki module here:
 https://github.com/meraki/dashboard-api-python
 
  
 You can typically install those modules with the following commands: 
+
 pip install requests
+
 pip install meraki
 
 You need to have a file named config.py in the same directory as the AddRulesToMXL3Firewall.py
@@ -40,7 +44,7 @@ Case323423
 40.17.41.118,40.17.41.119
 ```
 
-#Running the code:
+## Running the code:
 
 python3 AddRulesToMXL3Firewall.py
 
@@ -49,6 +53,7 @@ You will be prompted for confirmation before proceeding with the operation.
 If you wish to test the script with just one Network before running it for all, just
 look for the line with the following comment and uncomment the line below it:
 
-"#Uncomment line below if you wish to provide confirmation for each Network'"
+_"#Uncomment line below if you wish to provide confirmation for each Network"_
+
 
 
