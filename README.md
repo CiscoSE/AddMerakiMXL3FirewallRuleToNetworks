@@ -29,7 +29,7 @@ It should only have two lines:
 1. Comment to use for new rule to be added
 2. comma separated list of IP addresses in dot-decimal notation
 
-Example:
+Example of content for a **NewRuleToAdd.txt** file:
 
 ``` 
 Case323423
