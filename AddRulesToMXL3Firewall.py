@@ -98,7 +98,7 @@ for theNetwork in myNetworks:
     print("Updating rules for Network ID: "+theNetworkid+"...")
     meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
     #Uncomment line below if you wish to provide confirmation for each Network
-    if not input("Continue? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
+    #if not input("Continue? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
     #need to make sure we do not send more than 5 API calls per second for this org
     #so sleep 500ms since we are making 2 API calls per loop
     time.sleep(0.5)
