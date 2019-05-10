@@ -19,17 +19,21 @@ pip install requests
 pip install meraki
 
 You need to have a file named config.py in the same directory as the AddRulesToMXL3Firewall.py
-script with the following code:
+script with the definition of the Meraki API key to use to run the code as well as the Org ID for
+the Organanization for which you want to change the rules for all Networks.
 
+Example of content of the **config.py** file you must create: 
+``` 
 meraki_api_key = "yourMerakiAPIKey"
 meraki_org_id = "yourOrgID"
+```
 
 You also need to have the input file named NewRuleToAdd.txt in the same directory as the AddRulesToMXL3Firewall.py
 It should only have two lines:
 1. Comment to use for new rule to be added
 2. comma separated list of IP addresses in dot-decimal notation
 
-Example of content for a **NewRuleToAdd.txt** file:
+Example of content of the **NewRuleToAdd.txt** file you must create:
 
 ``` 
 Case323423
@@ -42,5 +46,9 @@ python3 AddRulesToMXL3Firewall.py
 
 You will be prompted for confirmation before proceeding with the operation. 
 
+If you wish to test the script with just one Network before running it for all, just
+look for the line with the following comment and uncomment the line below it:
+
+"#Uncomment line below if you wish to provide confirmation for each Network'"
 
 
