@@ -1,4 +1,4 @@
-# AddMerakiMXL3FirewallRuleToNetworks
+# Add Meraki MX L3 Firewall Rule to Networks
 This is a simple Python script that takes a NewRuleToAdd.txt file as input to add one rule with all the IP addresses from the list to each Network in the Org using the Meraki API. 
 Before going off to add the rules, it will print out to console a summary of the IPs to add to the new rule, the ticket number and the list of all networks it will add them to.
 It will then ask for confirmation from the operator of the script.
