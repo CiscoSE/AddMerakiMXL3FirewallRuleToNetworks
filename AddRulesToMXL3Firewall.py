@@ -21,6 +21,8 @@ import time
 import sys
 import config
 
+#If there is no syslog configured for the networks being affected, remove the "syslogEnabled"
+#field from the template below
 templateRuleDict= {
         "comment": "",
         "policy": "deny",
@@ -31,6 +33,7 @@ templateRuleDict= {
         "destCidr": "",
         "syslogEnabled": True
     }
+
 
 from meraki import meraki
 
