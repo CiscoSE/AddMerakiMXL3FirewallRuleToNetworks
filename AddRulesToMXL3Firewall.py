@@ -20,9 +20,8 @@ from meraki import meraki
 import time
 import sys
 import config
+import requests
 
-#If there is no syslog configured for the networks being affected, remove the "syslogEnabled"
-#field from the template below
 templateRuleDict= {
         "comment": "",
         "policy": "deny",
@@ -34,9 +33,36 @@ templateRuleDict= {
         "syslogEnabled": True
     }
 
+templateRuleDictNoSyslog= {
+        "comment": "",
+        "policy": "deny",
+        "protocol": "any",
+        "srcPort": "Any",
+        "srcCidr": "Any",
+        "destPort": "Any",
+        "destCidr": ""
+    }
+
+
 allowDuplicates=False
 
 from meraki import meraki
+
+# Return configured Syslog Servers for a network
+# https://dashboard.meraki.com/api_docs#list-the-syslog-servers-for-a-network
+def getsyslogservers(apikey, networkid, suppressprint=False):
+    calltype = 'Syslog servers'
+    geturl = '{0}/networks/{1}/syslogServers'.format(
+        str(meraki.base_url), str(networkid))
+    headers = {
+        'x-cisco-meraki-api-key': format(str(apikey)),
+        'Content-Type': 'application/json'
+    }
+    dashboard = requests.get(geturl, headers=headers)
+    result = meraki.__returnhandler(
+        dashboard.status_code, dashboard.text, calltype, suppressprint)
+    return result
+
 
 # sample in case you want to obtain the orgs programmatically
 #myOrgs = meraki.myorgaccess(config.meraki_api_key, True)
@@ -51,10 +77,13 @@ with open ("NewRuleToAdd.txt", "r") as myfile:
 if len(theRuleData)!=2:
     print("Input file must have exactly 2 lines!")
     sys.exit(1)
+
 #first retrieve the comment for the rule from the first line
 theRuleComment=theRuleData[0]
+
 #now retrieve the comma separated list of IP addresses to put in the rule
 theRuleIPs=theRuleData[1]
+
 # The following code will do a quick sanity check for correct formatting of the IP addresses in
 # dot-decimal notation by counting number of periods and commas. It does not make sure each one is
 # actually composed of 4 decimal numbers though. For a stronger , some of the suggestions here could be
@@ -68,30 +97,38 @@ if numPeriods/3 != numCommas+1:
     print("Number of commas in IP address list does not match number of IP addresses!")
     sys.exit(1)
 
-#compose the new rule to add in the right format using a Dict template specified earlier
-theRuleToAddDict=templateRuleDict
-theRuleToAddDict["comment"]=theRuleComment
-theRuleToAddDict["destCidr"]=theRuleIPs
-
 #obtain all networks in the Org specified by the config variable
 myNetworks = meraki.getnetworklist(config.meraki_api_key, config.meraki_org_id, None, True)
 
-print("About to insert the following rule:")
-print(theRuleToAddDict)
+#stop the script if the operator does not agree with the operation being previewed
+print("About to insert the following IPs: ",theRuleIPs," in a rule with comment: "+ theRuleComment)
 print("into the following networks:")
 for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
     theNetworkname = theNetwork["name"]
     print(theNetworkid, "  ",theNetworkname)
-#stop the script if the operator does not agree with the operation being previewed
 if not input("Procced? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
 
 for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
     print("Updating rules for Network ID: "+theNetworkid+"...")
+
     #get the rules
     theMXL3FirewallRules=meraki.getmxl3fwrules(config.meraki_api_key, theNetworkid, True)
+
+    #retrieving the syslog servers to know which template to use
+    theSysLogServers=getsyslogservers(config.meraki_api_key, theNetworkid, True)
+    #print("Syslog Servers: ", theSysLogServers)
+
+    # compose the new rule to add in the right format using the corresponding Dict template
+    if theSysLogServers==[]:
+        theRuleToAddDict = templateRuleDictNoSyslog
+    else:
+        theRuleToAddDict = templateRuleDict
+    theRuleToAddDict["comment"] = theRuleComment
+    theRuleToAddDict["destCidr"] = theRuleIPs
+
     #removing any marked as "Default rule" to avoid duplicates
     theMXL3FirewallCleanRules=[]
     for theRule in theMXL3FirewallRules:
@@ -104,10 +141,13 @@ for theNetwork in myNetworks:
 
     #add the new cleaned rule
     theMXL3FirewallCleanRules.append(theRuleToAddDict)
+
     #update the rules with the new one added
     meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
+
     #Uncomment line below if you wish to provide confirmation for each Network
     #if not input("Continue? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
+
     #need to make sure we do not send more than 5 API calls per second for this org
     #so sleep 500ms since we are making 2 API calls per loop
     time.sleep(0.5)
