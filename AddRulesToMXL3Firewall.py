@@ -34,6 +34,7 @@ templateRuleDict= {
         "syslogEnabled": True
     }
 
+allowDuplicates=False
 
 from meraki import meraki
 
@@ -88,17 +89,22 @@ if not input("Procced? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
 for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
+    print("Updating rules for Network ID: "+theNetworkid+"...")
     #get the rules
     theMXL3FirewallRules=meraki.getmxl3fwrules(config.meraki_api_key, theNetworkid, True)
     #removing any marked as "Default rule" to avoid duplicates
     theMXL3FirewallCleanRules=[]
     for theRule in theMXL3FirewallRules:
         if theRule["comment"]!="Default rule":
-            theMXL3FirewallCleanRules.append(theRule)
+            #check to see if we allow duplicates. If not, then do not a rule if another one with the same comment exists
+            if theRule["comment"]!=theRuleToAddDict["comment"] or allowDuplicates:
+                theMXL3FirewallCleanRules.append(theRule)
+            else:
+                print("Skipping duplicate rule ",theRule["comment"])
+
     #add the new cleaned rule
     theMXL3FirewallCleanRules.append(theRuleToAddDict)
     #update the rules with the new one added
-    print("Updating rules for Network ID: "+theNetworkid+"...")
     meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
     #Uncomment line below if you wish to provide confirmation for each Network
     #if not input("Continue? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
