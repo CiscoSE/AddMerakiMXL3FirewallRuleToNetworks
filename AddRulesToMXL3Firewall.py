@@ -112,7 +112,16 @@ if not input("Procced? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
 for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
-    print("Updating rules for Network ID: "+theNetworkid+"...")
+    print("Updating rules for Network ID: "+theNetworkid+" named: ",theNetwork["name"],"...")
+    continueAnswer="y"
+    #Comment line below if you wish to skip confirmation for each Network
+    continueAnswer=input("Continue? yes, no or skip(y/n/s): ").lower().strip()[:1]
+    if continueAnswer=="n":
+        print("Bye!")
+        sys.exit(1)
+    elif continueAnswer=="s":
+        print("Skipping Network ID: "+theNetworkid+" named: ",theNetwork["name"],"...")
+        continue
 
     #get the rules
     theMXL3FirewallRules=meraki.getmxl3fwrules(config.meraki_api_key, theNetworkid, True)
@@ -144,9 +153,6 @@ for theNetwork in myNetworks:
 
     #update the rules with the new one added
     meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
-
-    #Uncomment line below if you wish to provide confirmation for each Network
-    #if not input("Continue? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
     #need to make sure we do not send more than 5 API calls per second for this org
     #so sleep 500ms since we are making 2 API calls per loop

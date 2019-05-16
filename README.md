@@ -32,7 +32,7 @@ meraki_api_key = "yourMerakiAPIKey"
 meraki_org_id = "yourOrgID"
 ```
 
-You also need to have the input file named NewRuleToAdd.txt in the same directory as the AddRulesToMXL3Firewall.py
+You also need to have the input file named NewRuleToAdd.txt in the same directory as the **AddRulesToMXL3Firewall.py**
 It should only have two lines:
 1. Comment to use for new rule to be added
 2. comma separated list of IP addresses in dot-decimal notation
@@ -48,12 +48,14 @@ Case323423
 
 python3 AddRulesToMXL3Firewall.py
 
-You will be prompted for confirmation before proceeding with the operation. 
+You will be prompted for confirmation before proceeding with the overall operation. 
+You will also be prompted on a per Network basis if you wish to proceed with adding the rules
 
-If you wish to test the script with just one Network before running it for all, just
-look for the line with the following comment and uncomment the line below it:
+If you wish to remove this last confirmation so the script can run for all Networks
+without interruption, look for the comment below in the **AddRulesToMXL3Firewall.py**
+file and comment the line below it by adding # as the first character of the line
 
-_"#Uncomment line below if you wish to provide confirmation for each Network"_
+_"#Comment line below if you wish to skip confirmation for each Network"_
 
 
 
