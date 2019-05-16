@@ -55,5 +55,8 @@ look for the line with the following comment and uncomment the line below it:
 
 _"#Uncomment line below if you wish to provide confirmation for each Network"_
 
-
+**NOTE:**
+If there is no syslog configured for the networks where you are going to add the rules,
+remove the "syslogEnabled" field from the templateRuleDict dict in the code, otherwise you
+will get an error 404 when trying to insert the rule. 
 
