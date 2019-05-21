@@ -112,6 +112,11 @@ if not input("Procced? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
 
 for theNetwork in myNetworks:
     theNetworkid = theNetwork["id"]
+    #comment the 3 lines below if you do not want to filter out networks whose name matches that condition
+    if theNetwork["name"].startswith('z') or theNetwork["name"].endswith('switch-wifi') or theNetwork["name"].endswith('camera') or theNetwork["name"].endswith('systems manager'):
+        print("Skipping network named: ",theNetwork["name"], " because it starts with z or ends with switch-wifi, camera or systems manager" )
+        continue
+
     print("Updating rules for Network ID: "+theNetworkid+" named: ",theNetwork["name"],"...")
     continueAnswer="y"
     #Comment line below if you wish to skip confirmation for each Network
