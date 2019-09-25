@@ -43,7 +43,7 @@ templateRuleDictNoSyslog= {
         "destCidr": ""
     }
 
-
+#allow or dissalow adding duplicate firewall rules
 allowDuplicates=False
 
 from meraki import meraki
