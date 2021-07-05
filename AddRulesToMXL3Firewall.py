@@ -16,11 +16,14 @@ or implied.
 # the comment specified in the first line of the input file for the "comment" field of the rule
 # all other parameters for the rule are specified in templateRuleDict below for all insertions.
 
-from meraki import meraki
+import meraki
 import time
 import sys
 import config
 import requests
+
+
+dashboard = meraki.DashboardAPI(api_key=config.meraki_api_key)
 
 templateRuleDict= {
         "comment": "",
@@ -46,7 +49,7 @@ templateRuleDictNoSyslog= {
 #allow or dissalow adding duplicate firewall rules
 allowDuplicates=False
 
-from meraki import meraki
+#from meraki import meraki
 
 # Return configured Syslog Servers for a network
 # https://dashboard.meraki.com/api_docs#list-the-syslog-servers-for-a-network
@@ -98,7 +101,8 @@ if numPeriods/3 != numCommas+1:
     sys.exit(1)
 
 #obtain all networks in the Org specified by the config variable
-myNetworks = meraki.getnetworklist(config.meraki_api_key, config.meraki_org_id, None, True)
+#myNetworks = meraki.getnetworklist(config.meraki_api_key, config.meraki_org_id, None, True)
+myNetworks = dashboard.organizations.getOrganizationNetworks(config.meraki_org_id, total_pages='all')
 
 #stop the script if the operator does not agree with the operation being previewed
 print("About to insert the following IPs: ",theRuleIPs," in a rule with comment: "+ theRuleComment)
@@ -129,14 +133,17 @@ for theNetwork in myNetworks:
         continue
 
     #get the rules
-    theMXL3FirewallRules=meraki.getmxl3fwrules(config.meraki_api_key, theNetworkid, True)
+    # theMXL3FirewallRules=meraki.getmxl3fwrules(config.meraki_api_key, theNetworkid, True)
+    theMXL3FirewallRules=dashboard.appliance.getNetworkApplianceFirewallL3FirewallRules(theNetworkid)
+    # print("THE RULES:"+str(theMXL3FirewallRules))
 
     #retrieving the syslog servers to know which template to use
-    theSysLogServers=getsyslogservers(config.meraki_api_key, theNetworkid, True)
+    #theSysLogServers=getsyslogservers(config.meraki_api_key, theNetworkid, True)
+    theSysLogServers = dashboard.networks.getNetworkSyslogServers(theNetworkid)
     #print("Syslog Servers: ", theSysLogServers)
 
     # compose the new rule to add in the right format using the corresponding Dict template
-    if theSysLogServers==[]:
+    if theSysLogServers["servers"] == []:
         theRuleToAddDict = templateRuleDictNoSyslog
     else:
         theRuleToAddDict = templateRuleDict
@@ -155,9 +162,11 @@ for theNetwork in myNetworks:
 
     #add the new cleaned rule
     theMXL3FirewallCleanRules.append(theRuleToAddDict)
+    print("CLEAN RULES:"+str(theMXL3FirewallCleanRules))
 
     #update the rules with the new one added
-    meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
+    #meraki.updatemxl3fwrules(config.meraki_api_key, theNetworkid, theMXL3FirewallCleanRules,False,False)
+    updateResponse = dashboard.appliance.updateNetworkApplianceFirewallL3FirewallRules(theNetworkid, rules=theMXL3FirewallCleanRules)
 
     #need to make sure we do not send more than 5 API calls per second for this org
     #so sleep 500ms since we are making 2 API calls per loop

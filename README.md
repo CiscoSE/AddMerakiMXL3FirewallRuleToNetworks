@@ -12,8 +12,9 @@ Python 3.6 with the following modules installed:
 2. meraki
 
 
-More details on the meraki module here:
+More details on the meraki module here: 
 https://github.com/meraki/dashboard-api-python
+https://developer.cisco.com/meraki/api-v1/#!overview
 
  
 You can typically install those modules with the following commands: 
