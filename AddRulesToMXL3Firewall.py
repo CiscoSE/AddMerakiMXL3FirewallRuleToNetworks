@@ -152,7 +152,7 @@ for theNetwork in myNetworks:
 
     #removing any marked as "Default rule" to avoid duplicates
     theMXL3FirewallCleanRules=[]
-    for theRule in theMXL3FirewallRules:
+    for theRule in theMXL3FirewallRules["rules"]:
         if theRule["comment"]!="Default rule":
             #check to see if we allow duplicates. If not, then do not a rule if another one with the same comment exists
             if theRule["comment"]!=theRuleToAddDict["comment"] or allowDuplicates:
