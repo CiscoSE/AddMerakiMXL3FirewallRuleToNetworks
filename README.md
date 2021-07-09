@@ -26,6 +26,8 @@ pip install meraki
 You need to have a file named config.py in the same directory as the AddRulesToMXL3Firewall.py
 script with the definition of the Meraki API key to use to run the code as well as the Org ID for
 the Organanization for which you want to change the rules for all Networks.
+You can obtain the Meraki API Key and the org ID by following the instructions here:
+https://developer.cisco.com/meraki/api/#/rest/getting-started
 
 Example of content of the **config.py** file you must create: 
 ``` 
